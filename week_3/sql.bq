@@ -1,0 +1,18 @@
+CREATE OR REPLACE EXTERNAL TABLE `nyc-taxi-course.nytaxi.fhv_tripdata`
+OPTIONS (
+  format = 'CSV',
+  uris = ['gs://dtc_data_lake_nyc-taxi-course/data/fhv/fhv_tripdata_2019-*.csv.gz'],
+  allow_quoted_newlines = true
+);
+
+SELECT count(*) FROM `nyc-taxi-course.nytaxi.fhv_tripdata`;
+
+SELECT COUNT(DISTINCT(affiliated_base_number)) FROM `nyc-taxi-course.nytaxi.fhv_tripdata`;
+
+SELECT COUNT(*) FROM `nyc-taxi-course.nytaxi.fhv_tripdata` WHERE 'PUlocationID' IS NULL OR 'DOlocationID' IS NULL;
+
+CREATE OR REPLACE TABLE `nyc-taxi-course.nytaxi.fhv_partitioned_tripdata`
+PARTITION BY DATE(pickup_datetime)
+CLUSTER BY affiliated_base_number AS (
+  SELECT * FROM `nyc-taxi-course.nytaxi.fhv_tripdata`
+);
